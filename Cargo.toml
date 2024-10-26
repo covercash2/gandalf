@@ -1,9 +1,11 @@
-[package]
-name = "gandalf"
+[workspace]
+members = ["gandalf"]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
+[workspace.dependencies]
 anyhow = "1.0.91"
 async-trait = "0.1.83"
 base64 = "0.22.1"
