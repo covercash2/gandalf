@@ -1,5 +1,7 @@
 # you shall not pass
 
+![tests](https://github.com/github/docs/actions/workflows/rust.yml/badge.svg)
+
 an API proxy service.
 
 ## why do we need this?
