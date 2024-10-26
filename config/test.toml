@@ -1,0 +1,8 @@
+port = 8080
+key_path = "./test_keys.txt"
+
+[[peers]]
+request_path = "/api"
+name = "hoss"
+host = "hoss"
+port = 11434
