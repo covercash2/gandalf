@@ -5,7 +5,8 @@ use std::{
 };
 
 use async_trait::async_trait;
-use http::{HeaderName, Uri};
+use base64::Engine as _;
+use http::{HeaderName, HeaderValue, Uri};
 use pingora::{
     prelude::HttpPeer,
     proxy::{ProxyHttp, Session},
@@ -20,11 +21,11 @@ const KEY_HEADER: HeaderName = HeaderName::from_static("fellowship");
 
 pub struct ApiGateway {
     routes: HashMap<String, PeerRoute>,
-    keys: HashSet<String>,
+    keys: HashSet<Vec<u8>>,
 }
 
 impl ApiGateway {
-    pub fn new(routes: Vec<PeerRoute>, keys: HashSet<String>) -> Self {
+    pub fn new(routes: Vec<PeerRoute>, keys: HashSet<Vec<u8>>) -> Self {
         let routes = routes
             .into_iter()
             .map(|route| (route.request_path.clone(), route))
@@ -40,6 +41,18 @@ impl ApiGateway {
             .get(path)
             .ok_or(Error::UnknownPath(path.into()))?
             .socket_addr()
+    }
+
+    /// Authenticate a key header.
+    /// Keys are assumed to be URL and base64 encoded.
+    fn authenticate(&self, key: &HeaderValue) -> Result<()> {
+        let header_value = key.to_str()?;
+        let unencrypted = base64::engine::general_purpose::URL_SAFE.decode(header_value)?;
+        if self.keys.contains(&unencrypted) {
+            Ok(())
+        } else {
+            Err(Error::BadKey { key: unencrypted })
+        }
     }
 }
 
@@ -101,6 +114,22 @@ impl ProxyHttp for ApiGateway {
         tracing::info!(?peer, "configured peer");
 
         Ok(Box::new(peer))
+    }
+
+    async fn request_filter(
+        &self,
+        session: &mut Session,
+        _ctx: &mut Self::CTX,
+    ) -> PingoraResult<bool> {
+        let key = session.get_header(KEY_HEADER).ok_or(PingoraError::because(
+            pingora::ErrorType::HTTPStatus(403),
+            "missing auth header",
+            "header was None",
+        ))?;
+        self.authenticate(key)?;
+
+        // unblock request
+        Ok(false)
     }
 }
 

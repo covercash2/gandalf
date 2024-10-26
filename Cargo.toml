@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.91"
 async-trait = "0.1.83"
+base64 = "0.22.1"
 http = "1.1.0"
 pingora = { version = "0.3.0", features = ["proxy"] }
 serde = { version = "1.0.213", features = ["derive", "rc"] }

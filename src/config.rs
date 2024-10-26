@@ -27,9 +27,9 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn keys(&self) -> Result<HashSet<String>> {
+    pub fn keys(&self) -> Result<HashSet<Vec<u8>>> {
         let keys = crate::io::read_to_string(&self.key_path)?;
-        Ok(keys.lines().map(ToString::to_string).collect())
+        Ok(keys.lines().map(|s| s.as_bytes().to_vec()).collect())
     }
 }
 
