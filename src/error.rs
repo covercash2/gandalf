@@ -1,5 +1,5 @@
 use base64::DecodeError;
-use http::{header::ToStrError, HeaderValue};
+use http::header::ToStrError;
 use thiserror::Error as ThisError;
 
 pub type Result<T> = std::result::Result<T, Error>;
