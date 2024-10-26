@@ -1,6 +1,6 @@
 # you shall not pass
 
-![tests](https://github.com/github/docs/actions/workflows/rust.yml/badge.svg)
+![tests](https://github.com/covercash2/gandalf/actions/workflows/rust.yml/badge.svg)
 
 an API proxy service.
 
