@@ -5,9 +5,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(ThisError, Debug)]
 pub enum Error {
     #[error("unable to authenticate key: {key}")]
-    BadKey {
-        key: String,
-    },
+    BadKey { key: String },
     #[error("missing key header")]
     MissingKey,
 

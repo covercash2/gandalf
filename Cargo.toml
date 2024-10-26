@@ -11,4 +11,5 @@ pingora = { version = "0.3.0", features = ["proxy"] }
 serde = { version = "1.0.213", features = ["derive", "rc"] }
 thiserror = "1.0.65"
 toml = "0.8.19"
+tracing = { version = "0.1.40", features = ["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }

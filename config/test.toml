@@ -1,8 +1,9 @@
 port = 8080
 key_path = "./test_keys.txt"
+log_level = "info,gandalf=debug"
 
 [[peers]]
-request_path = "/api"
+request_path = "api"
 name = "hoss"
 host = "hoss"
 port = 11434

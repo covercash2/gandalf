@@ -20,6 +20,10 @@ pub struct Config {
     pub peers: Vec<PeerRoute>,
     pub port: u16,
     pub key_path: PathBuf,
+    /// Uses [`RUST_LOG`] conventions
+    ///
+    /// [`RUST_LOG`]: https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html
+    pub log_level: String,
 }
 
 impl Config {
