@@ -1,0 +1,9 @@
+port = 443
+key_path = "./keys.txt"
+log_level = "info,gandalf=info"
+
+[[peers]]
+request_path = "api"
+name = "hoss"
+host = "hoss"
+port = 11434
