@@ -1,3 +1,4 @@
 proxy_address = "localhost:8080"
 port = 8081
 log_level = "info,gandalf_tunnel=debug"
+https_enable = false
