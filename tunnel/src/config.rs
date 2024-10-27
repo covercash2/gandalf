@@ -12,6 +12,7 @@ pub struct Config {
     pub proxy_address: String,
     pub port: u16,
     pub log_level: String,
+    pub https_enable: bool,
 }
 
 impl Config {

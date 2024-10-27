@@ -14,11 +14,16 @@ use crate::error::Error;
 pub struct Tunnel {
     key: ApiKeyBase64,
     proxy_address: SocketAddr,
+    https_enable: bool,
 }
 
 impl Tunnel {
-    pub fn new(key: ApiKeyBase64, proxy_address: SocketAddr) -> Self {
-        Tunnel { key, proxy_address }
+    pub fn new(key: ApiKeyBase64, proxy_address: SocketAddr, https_enable: bool) -> Self {
+        Tunnel {
+            key,
+            proxy_address,
+            https_enable,
+        }
     }
 }
 
@@ -44,7 +49,7 @@ impl ProxyHttp for Tunnel {
         }
 
         // TODO: HTTPS
-        let peer = HttpPeer::new(self.proxy_address, false, "chrasharca.de".to_string());
+        let peer = HttpPeer::new(self.proxy_address, self.https_enable, "chrasharca.de".to_string());
 
         tracing::info!(?peer, "configured peer");
 

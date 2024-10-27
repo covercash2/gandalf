@@ -16,6 +16,7 @@ fn main() -> anyhow::Result<()> {
     let tunnel = Tunnel::new(
         (&api_key).into(),
         config.proxy_address.as_str().to_socket_addr()?,
+        config.https_enable,
     );
 
     let mut server = Server::new(None).expect("unable to build server");
