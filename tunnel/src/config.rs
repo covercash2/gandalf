@@ -52,7 +52,7 @@ mod tests {
 
     #[test]
     fn load_test_config() {
-        let config_dir = config_dir();
-        let _config = load_config(config_dir).expect("should be able to load test config");
+        let config_path = config_dir().join(CONFIG_FILENAME);
+        let _config = load_config(config_path).expect("should be able to load test config");
     }
 }
