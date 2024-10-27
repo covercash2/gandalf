@@ -5,8 +5,12 @@ use std::{
 };
 
 use async_trait::async_trait;
-use base64::Engine as _;
-use http::{HeaderName, HeaderValue, Uri};
+use gandalf_core::{
+    api_key::{ApiKey, ApiKeyBase64},
+    error::{Error, Result},
+    KEY_HEADER,
+};
+use http::{HeaderValue, Uri};
 use pingora::{
     prelude::HttpPeer,
     proxy::{ProxyHttp, Session},
@@ -15,17 +19,13 @@ use pingora::{
 use serde::{Deserialize, Serialize};
 use tracing::instrument;
 
-use crate::error::{Error, Result};
-
-const KEY_HEADER: HeaderName = HeaderName::from_static("fellowship");
-
 pub struct ApiGateway {
     routes: HashMap<String, PeerRoute>,
-    keys: HashSet<Vec<u8>>,
+    keys: HashSet<ApiKey>,
 }
 
 impl ApiGateway {
-    pub fn new(routes: Vec<PeerRoute>, keys: HashSet<Vec<u8>>) -> Self {
+    pub fn new(routes: Vec<PeerRoute>, keys: HashSet<ApiKey>) -> Self {
         let routes = routes
             .into_iter()
             .map(|route| (route.request_path.clone(), route))
@@ -46,12 +46,12 @@ impl ApiGateway {
     /// Authenticate a key header.
     /// Keys are assumed to be URL and base64 encoded.
     fn authenticate(&self, key: &HeaderValue) -> Result<()> {
-        let header_value = key.to_str()?;
-        let unencrypted = base64::engine::general_purpose::URL_SAFE.decode(header_value)?;
-        if self.keys.contains(&unencrypted) {
+        let header_value: ApiKeyBase64 = key.try_into()?;
+        let decrypted: ApiKey = (&header_value).try_into()?;
+        if self.keys.contains(&decrypted) {
             Ok(())
         } else {
-            Err(Error::BadKey { key: unencrypted })
+            Err(Error::BadKey { key: decrypted })
         }
     }
 }

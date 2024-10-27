@@ -566,6 +566,20 @@ dependencies = [
  "anyhow",
  "async-trait",
  "base64 0.22.1",
+ "gandalf-core",
+ "http 1.1.0",
+ "pingora",
+ "serde",
+ "thiserror",
+ "toml",
+ "tracing",
+]
+
+[[package]]
+name = "gandalf-core"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
  "http 1.1.0",
  "pingora",
  "serde",
@@ -573,6 +587,24 @@ dependencies = [
  "toml",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "gandalf-tunnel"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "base64 0.22.1",
+ "gandalf-core",
+ "http 1.1.0",
+ "pingora",
+ "serde",
+ "thiserror",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+ "xdg",
 ]
 
 [[package]]
@@ -2742,6 +2774,12 @@ dependencies = [
  "cfg-if",
  "windows-sys 0.48.0",
 ]
+
+[[package]]
+name = "xdg"
+version = "2.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "213b7324336b53d2414b2db8537e56544d981803139155afa84f76eeebb7a546"
 
 [[package]]
 name = "yaml-rust"

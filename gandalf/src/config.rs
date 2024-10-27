@@ -1,8 +1,9 @@
-use std::{collections::HashSet, path::PathBuf};
+use std::path::PathBuf;
 
+use gandalf_core::error::Result;
 use serde::{Deserialize, Serialize};
 
-use crate::{api_gateway::PeerRoute, error::Result};
+use crate::api_gateway::PeerRoute;
 
 fn config_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("./config")
@@ -10,7 +11,7 @@ fn config_dir() -> PathBuf {
 
 pub fn load_config(name: &str) -> Result<Config> {
     let path = config_dir().join(format!("{name}.toml"));
-    let contents = crate::io::read_to_string(path)?;
+    let contents = gandalf_core::io::read_to_string(path)?;
     let config = toml::from_str(&contents)?;
     Ok(config)
 }
@@ -24,13 +25,6 @@ pub struct Config {
     ///
     /// [`RUST_LOG`]: https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html
     pub log_level: String,
-}
-
-impl Config {
-    pub fn keys(&self) -> Result<HashSet<Vec<u8>>> {
-        let keys = crate::io::read_to_string(&self.key_path)?;
-        Ok(keys.lines().map(|s| s.as_bytes().to_vec()).collect())
-    }
 }
 
 #[cfg(test)]

@@ -1,5 +1,6 @@
 [workspace]
-members = ["gandalf"]
+members = ["gandalf","tunnel","core"]
+resolver = "2"
 
 [workspace.package]
 version = "0.1.0"
@@ -9,6 +10,7 @@ edition = "2021"
 anyhow = "1.0.91"
 async-trait = "0.1.83"
 base64 = "0.22.1"
+gandalf-core.path = "./core"
 http = "1.1.0"
 pingora = { version = "0.3.0", features = ["proxy"] }
 serde = { version = "1.0.213", features = ["derive", "rc"] }
@@ -16,3 +18,4 @@ thiserror = "1.0.65"
 toml = "0.8.19"
 tracing = { version = "0.1.40", features = ["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
+xdg = "2.5.2"
