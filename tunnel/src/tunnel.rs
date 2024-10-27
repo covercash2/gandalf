@@ -49,7 +49,11 @@ impl ProxyHttp for Tunnel {
         }
 
         // TODO: HTTPS
-        let peer = HttpPeer::new(self.proxy_address, self.https_enable, "chrasharca.de".to_string());
+        let peer = HttpPeer::new(
+            self.proxy_address,
+            self.https_enable,
+            "chrasharca.de".to_string(),
+        );
 
         tracing::info!(?peer, "configured peer");
 
