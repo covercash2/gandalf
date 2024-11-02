@@ -5,25 +5,19 @@ use gandalf_core::{api_key::ApiKeyBase64, KEY_HEADER};
 use pingora::{
     prelude::HttpPeer,
     proxy::{ProxyHttp, Session},
+    utils::tls::CertKey,
     Result as PingoraResult,
 };
 use tracing::instrument;
 
-use crate::error::Error;
-
 pub struct Tunnel {
     key: ApiKeyBase64,
     proxy_address: SocketAddr,
-    https_enable: bool,
 }
 
 impl Tunnel {
-    pub fn new(key: ApiKeyBase64, proxy_address: SocketAddr, https_enable: bool) -> Self {
-        Tunnel {
-            key,
-            proxy_address,
-            https_enable,
-        }
+    pub fn new(key: ApiKeyBase64, proxy_address: SocketAddr) -> Self {
+        Tunnel { key, proxy_address }
     }
 }
 
@@ -44,17 +38,27 @@ impl ProxyHttp for Tunnel {
             .req_header_mut()
             .append_header(KEY_HEADER, &self.key)?;
 
-        if header_already_exists {
-            return Err(Error::ExistingHeader.into());
-        }
-
-        // TODO: HTTPS
-        let peer = HttpPeer::new(
-            self.proxy_address,
-            self.https_enable,
-            "chrasharca.de".to_string(),
+        tracing::debug!(
+            headers = ?session.req_header().headers,
+            "request headers"
         );
 
+        if header_already_exists {
+            tracing::info!("found an exising auth header");
+            // return Err(Error::ExistingHeader.into());
+        }
+
+        let mut peer = HttpPeer::new(self.proxy_address, true, "chrasharca.de".to_string());
+        // let cert: Vec<u8> = include_bytes!("../../ssl/localhost+4.pem").to_vec();
+        let (certs, key) = pingora::tls::load_certs_and_key_files(
+            "./ssl/localhost+4.pem",
+            "./ssl/localhost+4-key.pem",
+        )
+        .unwrap()
+        .unwrap();
+        // let key: Vec<u8> = include_bytes!("../../ssl/localhost+4-key.pem").to_vec();
+        let cert_key = CertKey::new(certs.into_iter().map(|cert| cert.to_vec()).collect(), key.secret_der().to_vec());
+        peer.client_cert_key = Some(cert_key.into());
         tracing::info!(?peer, "configured peer");
 
         Ok(Box::new(peer))

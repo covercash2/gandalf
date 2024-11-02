@@ -1,4 +1,5 @@
 proxy_address = "localhost:8080"
 port = 8081
 log_level = "info,gandalf_tunnel=debug"
-https_enable = false
+https_enable = true
+ca_file = "/Users/chrash/Library/Application Support/mkcert/rootCA.pem"

@@ -1,6 +1,8 @@
-port = 443
+port = 4043
 key_path = "./keys.txt"
 log_level = "info,gandalf=info"
+ca_file = "/etc/letsencrypt/live/chrasharca.de/fullchain.pem"
+key_file = "/etc/letsencrypt/live/chrasharca.de/privkey.pem"
 
 [[peers]]
 request_path = "api"

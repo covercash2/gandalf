@@ -25,6 +25,8 @@ pub struct Config {
     ///
     /// [`RUST_LOG`]: https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html
     pub log_level: String,
+    pub ca_file: Option<PathBuf>,
+    pub key_file: Option<PathBuf>,
 }
 
 #[cfg(test)]

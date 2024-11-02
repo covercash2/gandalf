@@ -15,7 +15,7 @@ pub const KEY_HEADER: HeaderName = HeaderName::from_static("fellowship");
 pub fn setup_tracing(level: &str) {
     let log_layer = tracing_subscriber::fmt::layer()
         .with_span_events(FmtSpan::CLOSE)
-        .json();
+        .pretty();
 
     tracing_subscriber::Registry::default()
         .with(EnvFilter::from_str(level).unwrap())

@@ -1,6 +1,8 @@
 port = 8080
 key_path = "./test_keys.txt"
 log_level = "info,gandalf=debug"
+ca_file = "/Users/chrash/Library/Application Support/mkcert/rootCA.pem"
+key_file = "/Users/chrash/Library/Application Support/mkcert/rootCA-key.pem"
 
 [[peers]]
 request_path = "api"

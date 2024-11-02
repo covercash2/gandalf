@@ -1,25 +1,51 @@
 use api_gateway::ApiGateway;
+use clap::Parser;
 use gandalf_core::api_key::ApiKey;
-use pingora::{proxy::http_proxy_service, server::Server};
+use pingora::{
+    prelude::Opt,
+    proxy::http_proxy_service,
+    server::{configuration::ServerConf, Server},
+};
 
 mod api_gateway;
 mod config;
 
+#[derive(Parser, Debug)]
+pub struct Cli {
+    #[arg(short, long)]
+    config: String,
+}
+
 fn main() -> anyhow::Result<()> {
-    let config = option_env!("CONFIG").unwrap_or("test").to_lowercase();
-    let config = config::load_config(&config)?;
+    let cli_args = Cli::parse();
+    let config = config::load_config(&cli_args.config)?;
     gandalf_core::setup_tracing(config.log_level.as_str());
 
     let keys = ApiKey::from_file(&config.key_path)?;
     let gateway = ApiGateway::new(config.peers.clone(), keys);
 
-    let mut server = Server::new(None).expect("unable to build server");
+    let server_config = ServerConf {
+        ca_file: config.ca_file.clone().map(|file| file.display().to_string()),
+        ..Default::default()
+    };
+    let mut server = Server::new_with_opt_and_conf(Opt::default(), server_config);
+    server.bootstrap();
+
+    tracing::info!(
+        server_config = ?server.configuration,
+        "server config loaded",
+    );
 
     let mut proxy_service = http_proxy_service(&server.configuration, gateway);
     let address = format!("0.0.0.0:{}", config.port);
-    proxy_service.add_tcp(&address);
+    tracing::info!(%address, "starting TCP server");
 
-    server.bootstrap();
+    proxy_service.add_tls(
+        &address,
+        config.ca_file.unwrap().to_string_lossy().as_ref(),
+        config.key_file.unwrap().to_string_lossy().as_ref(),
+    ).unwrap();
+
     server.add_service(proxy_service);
     server.run_forever();
 }

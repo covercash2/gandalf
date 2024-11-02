@@ -12,12 +12,12 @@ pub struct Config {
     pub proxy_address: String,
     pub port: u16,
     pub log_level: String,
-    pub https_enable: bool,
+    pub ca_file: Option<PathBuf>,
 }
 
 impl Config {
-    pub fn load() -> Result<Self> {
-        let config_path = get_config_path()?;
+    pub fn load(path: impl Into<Option<PathBuf>>) -> Result<Self> {
+        let config_path = path.into().unwrap_or(get_config_path()?);
         let config = load_config(&config_path)?;
         Ok(config)
     }

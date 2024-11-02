@@ -100,6 +100,12 @@ impl ProxyHttp for ApiGateway {
         _ctx: &mut (),
     ) -> PingoraResult<Box<HttpPeer>> {
         tracing::debug!("processing peer request");
+
+        tracing::info!(
+            headers = ?session.req_header().headers,
+            "received headers",
+        );
+
         let address = self
             .get_address(&session.req_header().uri)
             .map_err(|error| {
@@ -109,7 +115,9 @@ impl ProxyHttp for ApiGateway {
                     error,
                 )
             })?;
-        let peer = HttpPeer::new(address, false, "hoss".to_string());
+        let mut peer = HttpPeer::new(address, false, "hoss".to_string());
+
+        peer.options.verify_cert = false;
 
         tracing::info!(?peer, "configured peer");
 
