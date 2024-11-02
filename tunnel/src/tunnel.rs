@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 use async_trait::async_trait;
 use gandalf_core::{api_key::ApiKeyBase64, KEY_HEADER};
 use pingora::{
+    http::ResponseHeader,
     prelude::HttpPeer,
     proxy::{ProxyHttp, Session},
     utils::tls::CertKey,
@@ -32,7 +33,8 @@ impl ProxyHttp for Tunnel {
         session: &mut Session,
         _ctx: &mut (),
     ) -> PingoraResult<Box<HttpPeer>> {
-        tracing::debug!("processing peer request");
+        let uri = &session.req_header().uri;
+        tracing::debug!(%uri, "processing peer request");
 
         let header_already_exists = session
             .req_header_mut()
@@ -57,10 +59,32 @@ impl ProxyHttp for Tunnel {
         .unwrap()
         .unwrap();
         // let key: Vec<u8> = include_bytes!("../../ssl/localhost+4-key.pem").to_vec();
-        let cert_key = CertKey::new(certs.into_iter().map(|cert| cert.to_vec()).collect(), key.secret_der().to_vec());
+        let cert_key = CertKey::new(
+            certs.into_iter().map(|cert| cert.to_vec()).collect(),
+            key.secret_der().to_vec(),
+        );
         peer.client_cert_key = Some(cert_key.into());
-        tracing::info!(?peer, "configured peer");
 
         Ok(Box::new(peer))
+    }
+
+    async fn request_filter(
+        &self,
+        session: &mut Session,
+        _ctx: &mut Self::CTX,
+    ) -> PingoraResult<bool> {
+        tracing::info!(uri = %session.req_header().uri);
+        if session.req_header().uri.to_string() == *"/" {
+            tracing::info!("root pinged");
+            session.write_response_body(Some("OK".into()), true).await?;
+            let headers = ResponseHeader::build(200, None)?;
+            session.set_keepalive(None);
+            session
+                .write_response_header(Box::new(headers), true)
+                .await?;
+            session.finish_body().await?;
+            return Ok(true);
+        }
+        Ok(false)
     }
 }
